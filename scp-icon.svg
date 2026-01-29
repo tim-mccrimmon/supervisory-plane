@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" fill="none">
+  <!-- Icon - rounded square with grid pattern -->
+  <rect x="2" y="2" width="56" height="56" rx="8" fill="#607F9E"/>
+
+  <!-- Horizontal dividers -->
+  <rect x="8" y="22" width="44" height="3" fill="white"/>
+  <rect x="8" y="35" width="44" height="3" fill="white"/>
+
+  <!-- Vertical dividers -->
+  <rect x="22" y="8" width="3" height="44" fill="white"/>
+  <rect x="35" y="8" width="3" height="44" fill="white"/>
+</svg>

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCP: Supervisory Control Plane</title>
+  <meta name="description" content="Managed infrastructure for streaming governed context to AI agents in real-time. Your agents follow your policies, not training data.">
+  <link rel="icon" type="image/svg+xml" href="scp-logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #1e293b;
+      line-height: 1.6;
+      background: #ffffff;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Header */
+    header {
+      padding: 24px 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .logo {
+      height: 48px;
+      width: auto;
+    }
+
+    /* Hero */
+    .hero {
+      padding: 80px 0 60px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      color: #0891b2;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .hero .subtitle {
+      font-size: 1.5rem;
+      color: #475569;
+      margin-bottom: 24px;
+      font-weight: 400;
+    }
+
+    .hero .description {
+      font-size: 1.125rem;
+      color: #64748b;
+      max-width: 600px;
+      margin: 0 auto 40px;
+    }
+
+    /* CTA Button */
+    .cta-button {
+      display: inline-block;
+      background: #0891b2;
+      color: white;
+      padding: 16px 32px;
+      font-size: 1.125rem;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+
+    .cta-button:hover {
+      background: #0e7490;
+    }
+
+    /* Value Props */
+    .value-props {
+      padding: 60px 0;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .value-props h2 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: 40px;
+      text-align: center;
+      color: #1e293b;
+    }
+
+    .value-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+
+    @media (min-width: 640px) {
+      .value-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .value-item h3 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 8px;
+    }
+
+    .value-item p {
+      font-size: 1rem;
+      color: #64748b;
+    }
+
+    /* How it works */
+    .how-it-works {
+      padding: 60px 0;
+      background: #f8fafc;
+      border-top: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .how-it-works .container {
+      text-align: center;
+    }
+
+    .how-it-works h2 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: 24px;
+      color: #1e293b;
+    }
+
+    .how-it-works p {
+      font-size: 1.125rem;
+      color: #475569;
+      max-width: 600px;
+      margin: 0 auto 16px;
+    }
+
+    .how-it-works .highlight {
+      font-weight: 600;
+      color: #0891b2;
+    }
+
+    /* Proof point */
+    .proof {
+      padding: 60px 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .proof h2 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: 24px;
+      text-align: center;
+      color: #1e293b;
+    }
+
+    .proof-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .proof-box.before {
+      border-left: 4px solid #ef4444;
+    }
+
+    .proof-box.after {
+      border-left: 4px solid #22c55e;
+    }
+
+    .proof-box h4 {
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+
+    .proof-box.before h4 {
+      color: #ef4444;
+    }
+
+    .proof-box.after h4 {
+      color: #22c55e;
+    }
+
+    .proof-box p {
+      font-size: 0.95rem;
+      color: #475569;
+      font-style: italic;
+    }
+
+    .proof-caption {
+      text-align: center;
+      font-size: 1rem;
+      color: #64748b;
+    }
+
+    /* SCS Link */
+    .scs-link {
+      padding: 40px 0;
+      text-align: center;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .scs-link p {
+      font-size: 1rem;
+      color: #64748b;
+    }
+
+    .scs-link a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .scs-link a:hover {
+      text-decoration: underline;
+    }
+
+    /* Final CTA */
+    .final-cta {
+      padding: 80px 0;
+      text-align: center;
+    }
+
+    .final-cta h2 {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #1e293b;
+    }
+
+    .final-cta p {
+      font-size: 1.125rem;
+      color: #64748b;
+      margin-bottom: 32px;
+    }
+
+    /* Footer */
+    footer {
+      padding: 24px 0;
+      border-top: 1px solid #e2e8f0;
+      text-align: center;
+    }
+
+    footer p {
+      font-size: 0.875rem;
+      color: #94a3b8;
+    }
+
+    footer a {
+      color: #64748b;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="container">
+      <img src="scp-logo-full.svg" alt="SCP - Supervisory Control Plane" class="logo">
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <h1>Context as a Service</h1>
+      <p class="subtitle">Your agents follow your policies, not training data.</p>
+      <p class="description">
+        SCP is managed infrastructure for streaming governed context to AI agents in real-time.
+        One policy update. Every agent. Instantly.
+      </p>
+      <a href="mailto:info@ohana-tech.com?subject=SCP%20Discovery%20Call" class="cta-button">Schedule a Discovery Call</a>
+    </div>
+  </section>
+
+  <section class="value-props">
+    <div class="container">
+      <h2>What SCP Delivers</h2>
+      <div class="value-grid">
+        <div class="value-item">
+          <h3>Agents follow your policies</h3>
+          <p>Without explicit context, AI improvises based on training data. With SCP, agents cite your formularies, follow your guidelines, and document compliance.</p>
+        </div>
+        <div class="value-item">
+          <h3>Change behavior without code</h3>
+          <p>Update a policy, move a tag, and every subscribed agent gets the new context in milliseconds. No redeploys, no restarts.</p>
+        </div>
+        <div class="value-item">
+          <h3>Build once, govern everywhere</h3>
+          <p>Define architectural standards once. Define security requirements once. Every AI system in your organization inherits them automatically.</p>
+        </div>
+        <div class="value-item">
+          <h3>Prove what happened</h3>
+          <p>At any moment, show auditors exactly which context version was active, who approved it, and which agents were using it.</p>
+        </div>
+        <div class="value-item">
+          <h3>Control the blast radius</h3>
+          <p>Tags determine which agents get which context. Canary one agent, roll out to a team, promote to production—or roll back instantly.</p>
+        </div>
+        <div class="value-item">
+          <h3>Model-agnostic</h3>
+          <p>Same governance layer works across Claude, GPT, Gemini, or your fine-tuned models. Switch providers without rewriting rules.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="how-it-works">
+    <div class="container">
+      <h2>How It Works</h2>
+      <p>
+        <span class="highlight">SCS</span> (Structured Context Specification) defines your governance context—policies, constraints, compliance requirements—as versioned, composable bundles.
+      </p>
+      <p>
+        <span class="highlight">SCP</span> streams that context to your AI agents at runtime. Agents request context by intent. SCP decides what they're allowed to know.
+      </p>
+      <p>
+        The agent doesn't change. The context changes. <strong>That's the control.</strong>
+      </p>
+    </div>
+  </section>
+
+  <section class="proof">
+    <div class="container">
+      <h2>The Difference Context Makes</h2>
+      <div class="proof-box before">
+        <h4>Without governed context</h4>
+        <p>"Based on current evidence and clinical guidelines, pembrolizumab is an appropriate treatment option, therefore the prior authorization request should be approved."</p>
+      </div>
+      <div class="proof-box after">
+        <h4>With governed context</h4>
+        <p>"This patient fully meets the pembrolizumab prior authorization criteria per [Formulary v2.1] and [Clinical Guidelines v1.2]. Approve for an initial 6-month period with clinical response assessment at 3 months. Audit trail established per HIPAA compliance."</p>
+      </div>
+      <p class="proof-caption">Same AI. Same request. Only difference: governed context.</p>
+    </div>
+  </section>
+
+  <section class="scs-link">
+    <div class="container">
+      <p>
+        SCP is built on <a href="https://structuredcontext.dev" target="_blank">Structured Context Specification (SCS)</a>—the open standard for AI context management.
+      </p>
+    </div>
+  </section>
+
+  <section class="final-cta">
+    <div class="container">
+      <h2>Ready to govern your AI agents?</h2>
+      <p>We're working with early partners to deploy SCP in regulated environments.</p>
+      <a href="mailto:info@ohana-tech.com?subject=SCP%20Discovery%20Call" class="cta-button">Schedule a Discovery Call</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 <a href="https://ohana-tech.com">Ohana AI Strategy & Systems Architecture</a>. All rights reserved.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
