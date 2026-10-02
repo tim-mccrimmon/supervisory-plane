@@ -4,628 +4,457 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SCP: Supervisory Control Plane</title>
-  <meta name="description" content="AI governance for when the stakes aren't theoretical. Your agents follow your policies, not training data.">
+  <meta name="description" content="SCP is the control plane for AI agents in regulated work. It delivers your policies to every agent at runtime, enforces them at the gateway, and keeps the record of what each agent knew and did.">
   <link rel="icon" type="image/svg+xml" href="scp-icon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    :root {
+      --brand: #607F9E;
+      --brand-dark: #3E5A78;
+      --navy: #13233A;
+      --ink: #1e293b;
+      --body: #475569;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --soft: #f6f8fb;
+      --accent: #b7791f;
     }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      color: #1e293b;
+      color: var(--ink);
       line-height: 1.6;
       background: #ffffff;
     }
 
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+    .narrow { max-width: 720px; }
+
+    a { color: var(--brand-dark); }
 
     /* Header */
     header {
-      padding: 24px 0;
-      border-bottom: 1px solid #e2e8f0;
+      position: sticky; top: 0; z-index: 10;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line);
     }
-
-    .logo {
-      height: 52px;
-      width: auto;
+    .nav { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+    .logo { height: 40px; width: auto; display: block; }
+    .nav-links { display: flex; gap: 28px; align-items: center; }
+    .nav-links a { color: var(--body); text-decoration: none; font-size: 0.95rem; font-weight: 500; }
+    .nav-links a:hover { color: var(--ink); }
+    .nav-links .btn-small {
+      background: var(--brand); color: #fff; padding: 8px 16px; border-radius: 8px;
     }
+    .nav-links .btn-small:hover { background: var(--brand-dark); color: #fff; }
+    @media (max-width: 760px) { .nav-links a:not(.btn-small) { display: none; } }
 
     /* Hero */
     .hero {
-      padding: 80px 0 60px;
-      text-align: center;
-      background-image: url('elements-of-ai.png');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      position: relative;
+      background: radial-gradient(1200px 500px at 80% -10%, #2b4a6b 0%, transparent 60%), var(--navy);
+      color: #fff;
+      padding: 96px 0 88px;
     }
-
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(255, 255, 255, 0.85);
-      z-index: 0;
+    .eyebrow {
+      font-size: 0.8rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+      color: #9fb6cd; margin-bottom: 18px;
     }
-
-    .hero .container {
-      position: relative;
-      z-index: 1;
-    }
-
     .hero h1 {
-      font-size: 2.75rem;
-      font-weight: 700;
-      color: #607F9E;
-      margin-bottom: 24px;
-      letter-spacing: -0.02em;
-      line-height: 1.1;
+      font-size: clamp(2.2rem, 5vw, 3.4rem); font-weight: 700; line-height: 1.08;
+      letter-spacing: -0.02em; max-width: 820px; margin-bottom: 24px;
     }
-
-    .hero .subtitle {
-      font-size: 1.25rem;
-      color: #475569;
-      margin-bottom: 12px;
-      font-weight: 400;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .hero .liability {
-      font-size: 1.125rem;
-      color: #64748b;
-      margin-bottom: 40px;
-    }
-
-    /* CTA Buttons */
-    .cta-group {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
+    .hero .subtitle { font-size: 1.2rem; color: #cbd8e5; max-width: 680px; margin-bottom: 36px; }
+    .cta-group { display: flex; gap: 14px; flex-wrap: wrap; }
     .cta-button {
-      display: inline-block;
-      background: #607F9E;
-      color: white;
-      padding: 16px 32px;
-      font-size: 1.125rem;
-      font-weight: 600;
-      text-decoration: none;
-      border-radius: 8px;
+      display: inline-block; background: #fff; color: var(--navy); padding: 14px 28px;
+      font-size: 1.05rem; font-weight: 600; text-decoration: none; border-radius: 8px;
       transition: background 0.2s;
     }
-
-    .cta-button:hover {
-      background: #4a6378;
-    }
-
+    .cta-button:hover { background: #e6edf4; }
     .cta-secondary {
-      display: inline-block;
-      background: transparent;
-      color: #607F9E;
-      padding: 16px 32px;
-      font-size: 1.125rem;
-      font-weight: 600;
-      text-decoration: none;
-      border-radius: 8px;
-      border: 2px solid #607F9E;
-      transition: all 0.2s;
+      display: inline-block; color: #fff; padding: 14px 28px; font-size: 1.05rem; font-weight: 600;
+      text-decoration: none; border-radius: 8px; border: 1px solid rgba(255,255,255,0.4);
+      transition: background 0.2s;
+    }
+    .cta-secondary:hover { background: rgba(255,255,255,0.08); }
+    .hero-note { margin-top: 40px; font-size: 0.9rem; color: #9fb6cd; }
+
+    /* Sections */
+    section { padding: 88px 0; }
+    section.alt { background: var(--soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    h2 { font-size: clamp(1.6rem, 3vw, 2.1rem); font-weight: 700; letter-spacing: -0.01em; line-height: 1.2; margin-bottom: 16px; }
+    .lede { font-size: 1.125rem; color: var(--body); max-width: 720px; margin-bottom: 40px; }
+    .section-label {
+      font-size: 0.78rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--brand); margin-bottom: 12px;
     }
 
-    .cta-secondary:hover {
-      background: #f1f5f9;
+    /* Cards */
+    .grid-3 { display: grid; gap: 20px; grid-template-columns: 1fr; }
+    .grid-4 { display: grid; gap: 20px; grid-template-columns: 1fr; }
+    @media (min-width: 720px) {
+      .grid-3 { grid-template-columns: repeat(3, 1fr); }
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 1000px) { .grid-4 { grid-template-columns: repeat(4, 1fr); } }
+    .card {
+      background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 26px;
+    }
+    .card h3 { font-size: 1.08rem; font-weight: 600; margin-bottom: 8px; }
+    .card p { font-size: 0.97rem; color: var(--body); }
+    .card .num {
+      display: inline-flex; width: 30px; height: 30px; border-radius: 50%;
+      background: var(--brand); color: #fff; font-weight: 700; font-size: 0.9rem;
+      align-items: center; justify-content: center; margin-bottom: 14px;
     }
 
-    /* Problem Section */
-    .problem {
-      padding: 60px 0;
-      border-top: 1px solid #e2e8f0;
-      text-align: center;
-    }
+    /* Diagram */
+    .diagram { margin-top: 48px; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 24px; }
+    .diagram { overflow-x: auto; }
+    .diagram svg { width: 100%; min-width: 720px; height: auto; display: block; }
+    .diagram-caption { text-align: center; color: var(--muted); font-size: 0.95rem; margin-top: 12px; }
 
-    .problem-statements {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      max-width: 600px;
-      margin: 0 auto;
-    }
+    /* Comparison */
+    .compare { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+    .compare th { text-align: left; padding: 16px 20px; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; background: var(--soft); border-bottom: 1px solid var(--line); }
+    .compare th:first-child { color: var(--muted); }
+    .compare th:last-child { color: var(--brand-dark); }
+    .compare td { padding: 16px 20px; font-size: 1rem; color: var(--body); border-bottom: 1px solid var(--line); vertical-align: top; width: 50%; }
+    .compare td:last-child { color: var(--ink); font-weight: 500; }
+    .compare tr:last-child td { border-bottom: none; }
 
-    .problem-statements p {
-      font-size: 1.125rem;
-      color: #475569;
-    }
+    /* Capabilities */
+    .cap-cols { display: grid; gap: 28px; grid-template-columns: 1fr; }
+    @media (min-width: 820px) { .cap-cols { grid-template-columns: 1fr 1fr; } }
+    .cap-col h3 { font-size: 1rem; font-weight: 600; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+    .tag { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; }
+    .tag.now { background: #e5eef7; color: var(--brand-dark); }
+    .tag.next { background: #fbf1e1; color: #8a5a12; }
+    .cap-list { list-style: none; background: #fff; border: 1px solid var(--line); border-radius: 12px; }
+    .cap-list li { padding: 14px 20px; border-bottom: 1px solid var(--line); font-size: 0.97rem; color: var(--body); }
+    .cap-list li:last-child { border-bottom: none; }
+    .cap-list strong { color: var(--ink); font-weight: 600; }
 
-    .problem-statements em {
-      font-style: italic;
-      color: #607F9E;
-    }
+    /* Regulation */
+    .timeline { display: grid; gap: 16px; grid-template-columns: 1fr; margin: 8px 0 40px; }
+    @media (min-width: 820px) { .timeline { grid-template-columns: repeat(3, 1fr); } }
+    .tl-item { border-left: 3px solid var(--brand); padding: 4px 0 4px 18px; }
+    .tl-date { font-weight: 700; font-size: 1.05rem; }
+    .tl-item p { color: var(--body); font-size: 0.95rem; }
+    .req { display: grid; gap: 0; grid-template-columns: 1fr; background: #fff; border: 1px solid var(--line); border-radius: 12px; }
+    .req-row { display: grid; grid-template-columns: 1fr; gap: 4px; padding: 16px 20px; border-bottom: 1px solid var(--line); }
+    @media (min-width: 720px) { .req-row { grid-template-columns: 260px 1fr; gap: 20px; } }
+    .req-row:last-child { border-bottom: none; }
+    .req-row .label { font-weight: 600; }
+    .req-row span:last-child { color: var(--body); }
+    .fineprint { font-size: 0.85rem; color: var(--muted); margin-top: 16px; }
 
-    /* Trust Bar */
-    .trust-bar {
-      padding: 40px 0;
-      background: #f8fafc;
-      border-top: 1px solid #e2e8f0;
-      border-bottom: 1px solid #e2e8f0;
-      text-align: center;
-    }
-
-    .trust-bar p {
-      font-size: 0.875rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: #64748b;
-      margin-bottom: 16px;
-    }
-
-    .trust-badges {
-      font-size: 1.125rem;
-      color: #475569;
-      font-weight: 500;
-    }
-
-    /* Solution Section */
-    .solution {
-      padding: 60px 0;
-      text-align: center;
-    }
-
-    .solution h2 {
-      font-size: 1.75rem;
-      font-weight: 600;
-      margin-bottom: 24px;
-      color: #1e293b;
-    }
-
-    .solution p {
-      font-size: 1.125rem;
-      color: #475569;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    /* Diagram Section */
-    .diagram-section {
-      padding: 40px 0 60px;
-      text-align: center;
-    }
-
-    .diagram-image {
-      max-width: 100%;
-      height: auto;
-      margin-bottom: 24px;
-      border-radius: 12px;
-    }
-
-    .diagram-caption {
-      font-size: 1rem;
-      color: #64748b;
-      font-family: 'Inter', sans-serif;
-    }
-
-    /* What Changes Section */
-    .what-changes {
-      padding: 60px 0;
-      border-top: 1px solid #e2e8f0;
-    }
-
-    .what-changes h2 {
-      font-size: 1.75rem;
-      font-weight: 600;
-      margin-bottom: 32px;
-      text-align: center;
-      color: #1e293b;
-    }
-
-    .comparison-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .comparison-table th {
-      text-align: left;
-      padding: 16px;
-      font-size: 0.875rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      border-bottom: 2px solid #e2e8f0;
-    }
-
-    .comparison-table th:first-child {
-      color: #ef4444;
-    }
-
-    .comparison-table th:last-child {
-      color: #22c55e;
-    }
-
-    .comparison-table td {
-      padding: 16px;
-      font-size: 1rem;
-      color: #475569;
-      border-bottom: 1px solid #e2e8f0;
-      vertical-align: top;
-    }
-
-    .comparison-table tr:last-child td {
-      border-bottom: none;
-    }
-
-    /* Compliance Deadline Section */
-    .compliance-deadline {
-      padding: 60px 0;
-      background: #fef9f0;
-      border-top: 1px solid #fde68a;
-      border-bottom: 1px solid #fde68a;
-      text-align: center;
-    }
-
-    .compliance-deadline .deadline-label {
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: #92400e;
-      margin-bottom: 12px;
-    }
-
-    .compliance-deadline h2 {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: #1e293b;
-      margin-bottom: 16px;
-    }
-
-    .compliance-deadline h2 span {
-      color: #b45309;
-    }
-
-    .compliance-deadline p {
-      font-size: 1.0625rem;
-      color: #475569;
-      max-width: 580px;
-      margin: 0 auto 12px;
-    }
-
-    .compliance-deadline .requirements {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      max-width: 560px;
-      margin: 28px auto 0;
-      text-align: left;
-    }
-
-    .compliance-deadline .req-item {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-      font-size: 0.9375rem;
-      color: #475569;
-    }
-
-    .compliance-deadline .req-item .req-label {
-      font-weight: 600;
-      color: #1e293b;
-      white-space: nowrap;
-      min-width: 220px;
-    }
-
-    /* Industries Section */
-    .industries {
-      padding: 60px 0;
-      background: #f8fafc;
-      border-top: 1px solid #e2e8f0;
-      border-bottom: 1px solid #e2e8f0;
-    }
-
-    .industries h2 {
-      font-size: 1.75rem;
-      font-weight: 600;
-      margin-bottom: 40px;
-      text-align: center;
-      color: #1e293b;
-    }
-
-    .industry-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 32px;
-    }
-
-    @media (min-width: 640px) {
-      .industry-grid {
-        grid-template-columns: 1fr 1fr 1fr;
-      }
-    }
-
-    .industry-item h3 {
-      font-size: 1.125rem;
-      font-weight: 600;
-      color: #1e293b;
-      margin-bottom: 8px;
-    }
-
-    .industry-item p {
-      font-size: 0.95rem;
-      color: #64748b;
-    }
-
-    .industry-item .not {
-      color: #94a3b8;
-      font-style: italic;
-    }
-
-    /* Under the Hood Section */
-    .under-hood {
-      padding: 60px 0;
-    }
-
-    .under-hood h2 {
-      font-size: 1.75rem;
-      font-weight: 600;
-      margin-bottom: 12px;
-      text-align: center;
-      color: #1e293b;
-    }
-
-    .under-hood .intro {
-      font-size: 1rem;
-      color: #64748b;
-      text-align: center;
-      margin-bottom: 32px;
-    }
-
-    .feature-list {
-      list-style: none;
-      max-width: 600px;
-      margin: 0 auto 32px;
-    }
-
-    .feature-list li {
-      padding: 12px 0;
-      border-bottom: 1px solid #e2e8f0;
-    }
-
-    .feature-list li:last-child {
-      border-bottom: none;
-    }
-
-    .feature-list strong {
-      color: #607F9E;
-    }
-
-    .feature-list span {
-      color: #475569;
-    }
-
-    .under-hood .summary {
-      text-align: center;
-      font-size: 1.125rem;
-      color: #475569;
-    }
-
-    .under-hood .summary strong {
-      color: #1e293b;
-    }
+    /* Stack */
+    .stack-card { display: flex; flex-direction: column; }
+    .stack-card .kicker { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .stack-card a { margin-top: auto; padding-top: 12px; font-weight: 600; font-size: 0.95rem; text-decoration: none; }
+    .stack-card a:hover { text-decoration: underline; }
+    .stack-card.highlight { border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand) inset; }
 
     /* Final CTA */
-    .final-cta {
-      padding: 80px 0;
-      text-align: center;
-      border-top: 1px solid #e2e8f0;
-    }
+    .final-cta { background: var(--navy); color: #fff; text-align: center; }
+    .final-cta h2 { color: #fff; }
+    .final-cta p { color: #cbd8e5; font-size: 1.125rem; margin: 0 auto 32px; max-width: 620px; }
 
-    .final-cta h2 {
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin-bottom: 16px;
-      color: #1e293b;
-    }
-
-    .final-cta p {
-      font-size: 1.125rem;
-      color: #64748b;
-      margin-bottom: 32px;
-    }
-
-    /* Footer */
-    footer {
-      padding: 24px 0;
-      border-top: 1px solid #e2e8f0;
-      text-align: center;
-    }
-
-    footer p {
-      font-size: 0.875rem;
-      color: #94a3b8;
-    }
-
-    footer a {
-      color: #64748b;
-      text-decoration: none;
-    }
-
-    footer a:hover {
-      text-decoration: underline;
-    }
+    footer { padding: 28px 0; border-top: 1px solid var(--line); }
+    .foot { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 0.875rem; color: var(--muted); }
+    .foot a { color: var(--muted); text-decoration: none; margin-left: 18px; }
+    .foot a:first-child { margin-left: 0; }
+    .foot a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
 
   <header>
-    <div class="container">
-      <img src="scp-logo-new.svg" alt="Supervisory Control Plane" class="logo">
+    <div class="container nav">
+      <a href="#top" aria-label="Supervisory Control Plane home"><img src="scp-logo-new.svg" alt="Supervisory Control Plane" class="logo"></a>
+      <nav class="nav-links">
+        <a href="#how-it-works">How it works</a>
+        <a href="#capabilities">Capabilities</a>
+        <a href="#regulation">Regulation</a>
+        <a href="mailto:info@ohana-tech.com?subject=SCP%20conversation" class="btn-small">Talk to us</a>
+      </nav>
     </div>
   </header>
 
-  <section class="hero">
+  <section class="hero" id="top">
     <div class="container">
-      <h1>AI governance for when the stakes aren't theoretical</h1>
-      <p class="subtitle">Your agent is capable. It's confident. It just doesn't know your rules.</p>
-      <p class="liability">And when it makes a decision you can't explain, you're the one liable.</p>
+      <p class="eyebrow">Supervisory Control Plane</p>
+      <h1>Governance for AI agents doing regulated work</h1>
+      <p class="subtitle">SCP delivers your policies to every AI agent at the moment it acts, enforces them where the agent reaches models and tools, and keeps a record of what each agent knew and did.</p>
       <div class="cta-group">
-        <a href="mailto:info@ohana-tech.com?subject=SCP%20Demo%20Request" class="cta-button">Request Demo</a>
-        <a href="#how-it-works" class="cta-secondary">See How It Works</a>
+        <a href="mailto:info@ohana-tech.com?subject=SCP%20demo%20request" class="cta-button">Request a demo</a>
+        <a href="#how-it-works" class="cta-secondary">See how it works</a>
+      </div>
+      <p class="hero-note">Built on the open <a href="https://structuredcontext.dev" style="color:#cbd8e5">Structured Context Specification</a>. Runs inside your boundary.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <p class="section-label">The gap</p>
+      <h2>Capable agents, missing context</h2>
+      <p class="lede">Today's models are good at the work. What they lack is your organization's rules, and a way to show afterward that they followed them.</p>
+      <div class="grid-3">
+        <div class="card">
+          <h3>They know the regulation, not your policy</h3>
+          <p>A model can explain HIPAA or ISO 13485. It doesn't know how your organization applies them, which exceptions you allow, or who signs off.</p>
+        </div>
+        <div class="card">
+          <h3>Each agent improvises a little differently</h3>
+          <p>Prompts drift, teams copy and edit them, and the same question gets different handling depending on which agent answers it.</p>
+        </div>
+        <div class="card">
+          <h3>Someone will ask what the AI knew</h3>
+          <p>Auditors, regulators, and customers increasingly expect evidence: which rules were in effect, which version, and what the agent did with them.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="problem">
+  <section class="alt" id="how-it-works">
     <div class="container">
-      <div class="problem-statements">
-        <p>AI knows what HIPAA is. It doesn't know what HIPAA means for <em>you</em>.</p>
-        <p>Every agent improvises slightly differently. That's not governance.</p>
-        <p>When regulators ask what your AI knew at time of decision, you need an answer. <em>August 2, 2026</em> is when they start asking.</p>
+      <p class="section-label">How it works</p>
+      <h2>Define once. Deliver, enforce, and record everywhere.</h2>
+      <p class="lede">The agent doesn't change. The context it works within does, and SCP is where that context is governed.</p>
+      <div class="grid-4">
+        <div class="card">
+          <span class="num">1</span>
+          <h3>Define</h3>
+          <p>Write your policies, boundaries, and procedures as versioned SCS bundles: structured, reviewable, and approved before anything uses them.</p>
+        </div>
+        <div class="card">
+          <span class="num">2</span>
+          <h3>Deliver</h3>
+          <p>SCP selects the context each agent needs for its role and the task at hand, and delivers it at runtime. Change a policy once; every agent gets the update.</p>
+        </div>
+        <div class="card">
+          <span class="num">3</span>
+          <h3>Enforce</h3>
+          <p>Gateways in front of models and tools apply the rules: which tools a role can use, which data may go to which model, and when to stop an agent that drifts.</p>
+        </div>
+        <div class="card">
+          <span class="num">4</span>
+          <h3>Record</h3>
+          <p>Every request is logged with the agent, its role and intent, the exact context version delivered, and what happened next.</p>
+        </div>
+      </div>
+
+      <div class="diagram">
+        <svg viewBox="0 0 1000 380" role="img" aria-label="Your governance defines SCS bundles; the Supervisory Control Plane delivers context to agents and drives the LLM and MCP gateways; agents reach models, tools, and data only through those gateways; every step is recorded in the audit trail.">
+          <defs>
+            <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="#64748b"/>
+            </marker>
+          </defs>
+          <g font-family="Inter, Helvetica, Arial, sans-serif">
+            <!-- governance -->
+            <rect x="20" y="130" width="190" height="120" rx="12" fill="#f6f8fb" stroke="#cbd5e1"/>
+            <text x="115" y="166" text-anchor="middle" font-size="16" font-weight="700" fill="#1e293b">Your governance</text>
+            <text x="115" y="192" text-anchor="middle" font-size="13" fill="#475569">Policies, procedures,</text>
+            <text x="115" y="210" text-anchor="middle" font-size="13" fill="#475569">boundaries as</text>
+            <text x="115" y="228" text-anchor="middle" font-size="13" fill="#475569">versioned SCS bundles</text>
+            <!-- SCP -->
+            <rect x="270" y="40" width="250" height="300" rx="14" fill="#13233A"/>
+            <text x="395" y="78" text-anchor="middle" font-size="17" font-weight="700" fill="#ffffff">Supervisory</text>
+            <text x="395" y="99" text-anchor="middle" font-size="17" font-weight="700" fill="#ffffff">Control Plane</text>
+            <g font-size="14" fill="#cbd8e5">
+              <rect x="295" y="122" width="200" height="40" rx="8" fill="#22395a"/><text x="395" y="147" text-anchor="middle">Select context by role + intent</text>
+              <rect x="295" y="172" width="200" height="40" rx="8" fill="#22395a"/><text x="395" y="197" text-anchor="middle">Deliver at runtime</text>
+              <rect x="295" y="222" width="200" height="40" rx="8" fill="#22395a"/><text x="395" y="247" text-anchor="middle">Drive enforcement</text>
+              <rect x="295" y="272" width="200" height="40" rx="8" fill="#22395a"/><text x="395" y="297" text-anchor="middle">Record everything</text>
+            </g>
+            <!-- agents -->
+            <rect x="580" y="40" width="170" height="130" rx="12" fill="#ffffff" stroke="#607F9E" stroke-width="1.5"/>
+            <text x="665" y="72" text-anchor="middle" font-size="16" font-weight="700" fill="#1e293b">AI agents</text>
+            <text x="665" y="98" text-anchor="middle" font-size="13" fill="#475569">Chat assistants</text>
+            <text x="665" y="118" text-anchor="middle" font-size="13" fill="#475569">Coding agents</text>
+            <text x="665" y="138" text-anchor="middle" font-size="13" fill="#475569">Agent workflows</text>
+            <!-- gateways -->
+            <rect x="580" y="210" width="170" height="54" rx="10" fill="#e5eef7" stroke="#607F9E"/>
+            <text x="665" y="242" text-anchor="middle" font-size="14" font-weight="600" fill="#3E5A78">LLM gateway</text>
+            <rect x="580" y="276" width="170" height="54" rx="10" fill="#e5eef7" stroke="#607F9E"/>
+            <text x="665" y="308" text-anchor="middle" font-size="14" font-weight="600" fill="#3E5A78">MCP / tool gateway</text>
+            <!-- destinations -->
+            <rect x="810" y="200" width="170" height="74" rx="12" fill="#f6f8fb" stroke="#cbd5e1"/>
+            <text x="895" y="230" text-anchor="middle" font-size="14" font-weight="600" fill="#1e293b">Models</text>
+            <text x="895" y="252" text-anchor="middle" font-size="12" fill="#475569">private or frontier, by policy</text>
+            <rect x="810" y="286" width="170" height="54" rx="12" fill="#f6f8fb" stroke="#cbd5e1"/>
+            <text x="895" y="318" text-anchor="middle" font-size="14" font-weight="600" fill="#1e293b">Tools and data</text>
+            <!-- arrows -->
+            <line x1="210" y1="190" x2="268" y2="190" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+            <line x1="520" y1="105" x2="578" y2="105" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+            <text x="549" y="96" text-anchor="middle" font-size="11" fill="#64748b">context</text>
+            <line x1="520" y1="245" x2="578" y2="237" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+            <line x1="520" y1="290" x2="578" y2="302" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+            <line x1="665" y1="170" x2="665" y2="208" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+            <line x1="750" y1="237" x2="808" y2="237" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+            <line x1="750" y1="303" x2="808" y2="313" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+          </g>
+        </svg>
+        <p class="diagram-caption">Agents reach models and tools only through gateways that SCP controls. Every step is recorded.</p>
       </div>
     </div>
   </section>
 
-  <section class="trust-bar">
-    <div class="container">
-      <p>Support for regulated environments</p>
-      <div class="trust-badges">HIPAA &middot; SOC2 &middot; CHAI &middot; NIST &middot; EU AI Act</div>
-    </div>
-  </section>
-
-  <section class="solution" id="how-it-works">
-    <div class="container">
-      <h2>Your governance. Their guardrails.</h2>
-      <p>SCP streams your governance context—your policies, your boundaries, your compliance requirements—directly to your AI agents at runtime. They operate inside your rules, not their training data.</p>
-    </div>
-  </section>
-
-  <section class="diagram-section">
-    <div class="container">
-      <img src="scp-layers.png" alt="SCP Architecture: AI Agents layer, Supervisory Control Plane layer, Your Governance layer" class="diagram-image">
-      <p class="diagram-caption">The agent handles the work. SCP keeps it within your boundaries.</p>
-    </div>
-  </section>
-
-  <section class="what-changes">
-    <div class="container">
-      <h2>What changes</h2>
-      <table class="comparison-table">
-        <thead>
-          <tr>
-            <th>Without SCP</th>
-            <th>With SCP</th>
-          </tr>
-        </thead>
+  <section>
+    <div class="container narrow">
+      <p class="section-label">What changes</p>
+      <h2>From improvising to operating inside your rules</h2>
+      <table class="compare" style="margin-top:24px">
+        <thead><tr><th>Without a control plane</th><th>With SCP</th></tr></thead>
         <tbody>
-          <tr>
-            <td>Agent improvises based on training</td>
-            <td>Agent follows your policies</td>
-          </tr>
-          <tr>
-            <td>No proof of what it knew</td>
-            <td>Full audit trail, every request</td>
-          </tr>
-          <tr>
-            <td>Behavior drifts between agents</td>
-            <td>Consistent governance, every agent</td>
-          </tr>
-          <tr>
-            <td>Update the agent to change behavior</td>
-            <td>Update context, agent adjusts instantly</td>
-          </tr>
+          <tr><td>Agents improvise from training data and copied prompts</td><td>Agents work from your approved, versioned policies</td></tr>
+          <tr><td>Behavior varies from one agent and team to the next</td><td>One source of governance for every agent</td></tr>
+          <tr><td>Changing behavior means changing each agent</td><td>Change the context once; every agent picks it up</td></tr>
+          <tr><td>Any agent can call any model or tool it can reach</td><td>Models, tools, and data access follow role and data classification</td></tr>
+          <tr><td>Little evidence of what the agent knew</td><td>A record of the context, version, and outcome for each request</td></tr>
         </tbody>
       </table>
     </div>
   </section>
 
-  <section class="compliance-deadline">
+  <section class="alt" id="capabilities">
     <div class="container">
-      <p class="deadline-label">Regulatory deadline</p>
-      <h2>EU AI Act enforcement begins <span>August 2, 2026</span></h2>
-      <p>Healthcare AI systems are classified as high-risk. Full compliance is required in 144 days. The clock is running.</p>
-      <p>The regulation requires automatic logging, documented risk management, and technical documentation — for every AI system that touches patient data or clinical decisions.</p>
-      <div class="requirements">
-        <div class="req-item">
-          <span class="req-label">Automatic logging (Art. 12)</span>
-          <span>SCP logs every agent decision with full context trail — what the agent knew, when, under which policy.</span>
-        </div>
-        <div class="req-item">
-          <span class="req-label">Technical documentation (Art. 11)</span>
-          <span>SCS bundles are your documentation — structured, versioned, auditable before deployment.</span>
-        </div>
-        <div class="req-item">
-          <span class="req-label">Human oversight (Art. 14)</span>
-          <span>Governance lives in the control plane. Humans define the rules; agents follow them.</span>
-        </div>
-        <div class="req-item">
-          <span class="req-label">HIPAA audit controls (§164.312(b))</span>
-          <span>Every context request logged with agent identity, role, intent, and policies delivered.</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="industries">
-    <div class="container">
-      <h2>Your industry. Your rules.</h2>
-      <div class="industry-grid">
-        <div class="industry-item">
-          <h3>Healthcare</h3>
-          <p>Prior authorization. Clinical documentation. PHI access governance. SCP delivers your policies to your agents at runtime — with a full audit trail for every decision. <span class="not">EU AI Act and HIPAA compliant by design.</span></p>
-        </div>
-        <div class="industry-item">
-          <h3>Finance</h3>
-          <p>Your risk tolerance. Your lending criteria. Your fraud escalation rules. <span class="not">Not textbook compliance.</span></p>
-        </div>
-        <div class="industry-item">
-          <h3>Legal</h3>
-          <p>Your privilege protocols. Your conflict checks. Your document retention policy. <span class="not">Not general best practices.</span></p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="under-hood">
-    <div class="container">
+      <p class="section-label">Capabilities</p>
       <h2>Under the hood</h2>
-      <p class="intro">For teams that need to validate the architecture:</p>
-      <ul class="feature-list">
-        <li><strong>Supervisory control plane</strong> <span>— Centralized governance for all your agents, one place to manage</span></li>
-        <li><strong>Versioned bundles</strong> <span>— Immutable governance artifacts, semantically versioned</span></li>
-        <li><strong>Graph-based selection</strong> <span>— Agents get relevant context, not everything</span></li>
-        <li><strong>Real-time streaming</strong> <span>— Update governance, agents adjust immediately</span></li>
-        <li><strong>Complete audit trail</strong> <span>— What agent, what context, what decision, when</span></li>
-      </ul>
-      <p class="summary">Your agents become thin clients. <strong>Governance lives in the control plane.</strong></p>
+      <p class="lede">For teams that need to validate the architecture. SCP is in active development; here is what exists today and what the next release adds.</p>
+      <div class="cap-cols">
+        <div class="cap-col">
+          <h3>Core platform <span class="tag now">Today</span></h3>
+          <ul class="cap-list">
+            <li><strong>Versioned bundles.</strong> Governance as immutable, semantically versioned SCS artifacts.</li>
+            <li><strong>Bundle registry.</strong> Publish, approve, and pin the context agents are allowed to use.</li>
+            <li><strong>Selection by role and intent.</strong> Graph-based selection gives each agent the relevant context, not everything.</li>
+            <li><strong>Runtime delivery.</strong> Agents request context as they work; policy updates take effect without redeploying agents.</li>
+            <li><strong>Audit trail.</strong> Which agent, which role and intent, which context version, when.</li>
+          </ul>
+        </div>
+        <div class="cap-col">
+          <h3>Next release <span class="tag next">In development</span></h3>
+          <ul class="cap-list">
+            <li><strong>Gateway enforcement.</strong> SCP drives an LLM gateway and an MCP gateway, so rules apply even to agents you didn't build.</li>
+            <li><strong>Data-classification routing.</strong> Sensitive data stays on private models; frontier models only where policy allows.</li>
+            <li><strong>Tools and skills by role.</strong> Deploy the right tools to the right people and agents from one place.</li>
+            <li><strong>Usage and intervention.</strong> Telemetry across every agent, and the ability to stop one that goes off policy.</li>
+            <li><strong>Governance console.</strong> A web interface for compliance teams to review policy, usage, and evidence.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="regulation">
+    <div class="container">
+      <p class="section-label">Regulation</p>
+      <h2>The EU AI Act timeline moved. The work didn't.</h2>
+      <p class="lede">The Digital Omnibus on AI, in force since July 27, 2026, pushed back the high-risk obligations. Organizations using the extra time to build evidence and oversight will be in a far better position than those waiting for the date.</p>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-date">August 2, 2026</div>
+          <p>Transparency obligations for AI systems (Article 50) apply on the original schedule.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">December 2, 2027</div>
+          <p>High-risk obligations for stand-alone Annex III systems, such as credit scoring and employment decisions.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">August 2, 2028</div>
+          <p>High-risk obligations for AI in regulated products under Annex I, including medical devices.</p>
+        </div>
+      </div>
+      <div class="req">
+        <div class="req-row"><span class="label">Record-keeping (EU AI Act Art. 12)</span><span>SCP logs each agent request with the context and policy version in effect.</span></div>
+        <div class="req-row"><span class="label">Technical documentation (Art. 11)</span><span>SCS bundles are structured, versioned documentation of how the system is meant to behave.</span></div>
+        <div class="req-row"><span class="label">Human oversight (Art. 14)</span><span>People define and approve the rules in the control plane, and can intervene when an agent drifts.</span></div>
+        <div class="req-row"><span class="label">HIPAA audit controls (§164.312(b))</span><span>Requests are logged with agent identity, role, intent, and the policies delivered.</span></div>
+        <div class="req-row"><span class="label">Quality systems (ISO 13485, 21 CFR 820)</span><span>Versioned, approved context and a request-level record support controlled processes and traceability.</span></div>
+      </div>
+      <p class="fineprint">SCP supports your compliance program; it doesn't replace legal or regulatory advice. Dates reflect Regulation (EU) 2024/1689 as amended by the Digital Omnibus on AI.</p>
+    </div>
+  </section>
+
+  <section class="alt">
+    <div class="container">
+      <p class="section-label">Where it fits</p>
+      <h2>Your industry. Your rules.</h2>
+      <div class="grid-4" style="margin-top:28px">
+        <div class="card">
+          <h3>Healthcare</h3>
+          <p>Prior authorization, clinical documentation, and PHI access, governed by your policies with a record of every decision.</p>
+        </div>
+        <div class="card">
+          <h3>Medical devices and life sciences</h3>
+          <p>Design controls, complaint handling, and quality records, where AI assistance has to fit the quality system.</p>
+        </div>
+        <div class="card">
+          <h3>Financial services</h3>
+          <p>Your credit criteria, risk tolerance, and escalation rules, applied consistently rather than reinvented per prompt.</p>
+        </div>
+        <div class="card">
+          <h3>Legal</h3>
+          <p>Your privilege protocols, conflict checks, and retention policies, not general best practices.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <p class="section-label">The stack</p>
+      <h2>One part of a private, governed AI platform</h2>
+      <p class="lede">SCP works on its own, and it's designed to run inside your security boundary alongside the rest of the Ohana stack.</p>
+      <div class="grid-3">
+        <div class="card stack-card">
+          <p class="kicker">Open specification</p>
+          <h3>Structured Context Specification</h3>
+          <p>The open format for machine-readable governance context: bundles, documents, and the relationships between them.</p>
+          <a href="https://structuredcontext.dev">structuredcontext.dev &rarr;</a>
+        </div>
+        <div class="card stack-card highlight">
+          <p class="kicker">Runtime</p>
+          <h3>Supervisory Control Plane</h3>
+          <p>Delivers, enforces, and records governance context for every agent, model, and tool call.</p>
+          <a href="mailto:info@ohana-tech.com?subject=SCP%20demo%20request">Request a demo &rarr;</a>
+        </div>
+        <div class="card stack-card">
+          <p class="kicker">Platform</p>
+          <h3>Private AI</h3>
+          <p>Models and agents running on infrastructure you control, so sensitive data never leaves your boundary.</p>
+          <a href="https://ohana-tech.com">ohana-tech.com &rarr;</a>
+        </div>
+      </div>
     </div>
   </section>
 
   <section class="final-cta">
     <div class="container">
-      <h2>Your agents are making decisions right now.</h2>
-      <p>Do you know what rules they're following?</p>
-      <a href="mailto:info@ohana-tech.com?subject=SCP%20Demo%20Request" class="cta-button">Request Demo</a>
+      <h2>Your agents are making decisions today.</h2>
+      <p>Let's look at which rules they're working from, and what it would take to make those rules yours.</p>
+      <a href="mailto:info@ohana-tech.com?subject=SCP%20demo%20request" class="cta-button">Request a demo</a>
     </div>
   </section>
 
   <footer>
-    <div class="container">
-      <p>&copy; 2026 <a href="https://ohana-tech.com">Ohana AI Strategy & Systems Architecture</a>. All rights reserved.</p>
+    <div class="container foot">
+      <span>&copy; 2026 Ohana Consulting LLC</span>
+      <span>
+        <a href="https://structuredcontext.dev">SCS</a>
+        <a href="https://ohana-tech.com">Ohana</a>
+        <a href="mailto:info@ohana-tech.com">info@ohana-tech.com</a>
+      </span>
     </div>
   </footer>
 
